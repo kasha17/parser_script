@@ -7,6 +7,15 @@ def categorize_links(base_url):
     try:
         response = requests.get(base_url)
         response.raise_for_status()
+    except requests.exceptions.HTTPError as errh:
+        print(f"HTTP Error fetching: {errh}")
+        return [], []
+    except requests.exceptions.ConnectionError as errc:
+        print(f"Connecting Error fetching: {errc}")
+        return [], []
+    except requests.exceptions.Timeout as errt:
+        print(f"Timeout Error fetching: {errt}")
+        return [], []
     except requests.RequestException as e:                 # проверка
         print(f"Error fetching {base_url}: {e}")
         return [], []
