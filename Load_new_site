@@ -1,0 +1,26 @@
+import json
+import os
+from django.core.management.base import BaseCommand
+from database.models import OfficialSite
+from django.conf import settings
+
+class Command(BaseCommand):
+    help = 'Load initial data from a JSON fixture'
+
+    def handle(self, *args, **kwargs):
+        fixture_path = os.path.join(settings.BASE_DIR, 'fixtures', 'initial_sites.json')
+
+        if not os.path.exists(fixture_path):
+            self.stdout.write(self.style.ERROR(f'Fixture file not found: {fixture_path}'))
+            return
+
+        with open(fixture_path, 'r') as file:
+            data = json.load(file)
+
+        for item in data:
+            model_name = item.get('model')
+            if model_name == 'database.officialsite':
+                url = item.get('fields').get('url')
+                OfficialSite.objects.get_or_create(url=url)
+
+        self.stdout.write(self.style.SUCCESS('Successfully loaded initial data'))
